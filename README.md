@@ -62,8 +62,8 @@ export default Em.Route.extend({
     this.notifications.on('alert', function(message){
       alert(message); // or do whatever you want
     });
-    this.notifications.on('badge', function(message){
-      alert(message); // or do whatever you want
+    this.notifications.on('badge', (badgeCount) => {
+      this.set('badge', badgeCount); // or do whatever you want
     });
   }.on('init'),
 
