@@ -1,16 +1,209 @@
 import Em from 'ember';
 
-export default Em.Service.extend(Em.Evented, {
+/**
+  Service that allows for registration/unregistration and handling of push
+  notifications received from GCM or APNs.
 
+  Configuration and setup of the service is done in an initializer:
+
+  ```javascript
+  import NotificationsService from 'cordova-shims/services/notifications';
+
+  export function initialize(container, application) {
+    let service = NotificationsService.create({
+      gcmSenderId: '{INSERT-KEY-FROM-GCM-HERE}',
+      gcmTimeout: 10000 // Timeout for GCM in ms. Default: 15000
+    });
+    application.register('service:notifications', service, {
+      instantiate: false
+    });
+    application.inject('route', 'notifications', 'service:notifications');
+  }
+
+  export default {
+    name: 'notifications-service',
+    initialize: initialize
+  };
+  ```
+
+  @class Notifications
+  @namespace CordovaShims.Services
+  @module cordova-shims/services/notifications
+  @extends Ember.Service
+ */
+export default Em.Service.extend(Em.Evented, {
+  /**
+   @event alert
+   @param {String} message The message received in the payload
+  */
+
+  /**
+   @event badge
+   @param {Number} count Badge count recieved in the payload
+  */
+
+  /**
+   @event sound
+   @param {String} filename Filename of the sound that should be played
+  */
+
+  /**
+   Please do not attach event listeners to this event. Use the `register` method
+   instead to handle device registration.
+
+   @event registered
+   @private
+   @param {Object} data An object with a `network` and a `token`. `network` will
+                        be either 'apns' or 'gcm'.
+  */
+
+  /**
+    Project ID from Google API Console. Must be set if you want to register
+    devices with GCM.
+
+    @property gcmSenderId
+    @type String
+  */
   gcmSenderId: null,
+
+  /**
+    Timeout for GCM registration. In ms.
+
+    @property gcmTimeout
+    @type Number
+    @default 15000
+  */
   gcmTimeout: 15000,
 
   init: function(){
     this._subscribeForEcb();
     this.on('badge', this, this._setBadgeCount);
     this.on('sound', this, this._playSound);
+    if (!window.device) {
+      Ember.Logger.warn("Missing Cordova Device plugin");
+    }
   },
 
+  /**
+    Registers the device for push notifications.
+
+    Example:
+
+    ```javascript
+    // app/routes/application.js
+    import Em from 'ember';
+
+    export default Em.Route.extend({
+      actions: {
+        subscribeForNotifications: function(){
+          let store = this.store;
+
+          this.notifications.register().then(function(data){
+            let network = data.network,
+                  token = data.token;
+            return store.createRecord('device', {
+              network: network,
+              token: token
+            }).save();
+          }).then(function(deviceModelFromStore){
+            Em.Logger.info('Successfully registered for notifications');
+          }).catch(function(error){
+            Em.Logger.error('Something went wrong registering for notifications', error);
+          });
+        }
+      }
+    });
+    ```
+
+    @method register
+    @return {RSVP.Promise} A promise that will resolve with an object containing
+                           the `network` (apns or gcm) and the `token` for the
+                           device.
+  */
+  register: function(){
+    return new Em.RSVP.Promise((resolve, reject) => {
+      const pushNotification = window.plugins.pushNotification;
+      let success = resolve;
+
+      this.one('_registration', resolve);
+      switch (window.device.platform.toLowerCase()) {
+        case 'android':
+        case 'amazon-fireos':
+          let gcmSenderId = this.get('gcmSenderId'),
+              gcmTimeout  = this.get('gcmTimeout');
+
+          Em.assert('Attempted to register device for notifications with GCM Sender ID', gcmSenderId);
+
+          Em.Logger.info('Attempting registration with GCM');
+          success = function(){
+            // Wait for registration event for up to 15 seconds
+            setTimeout(function(){
+              reject(new Error('Timed out while registering for GCM'));
+            }, gcmTimeout);
+          };
+          pushNotification.register(success, reject, {
+            senderId: gcmSenderId,
+            ecb: "onNotificationGCM"
+          });
+          break;
+        case 'ios':
+          Em.Logger.info('Attempting registration with APNS');
+          success = (token) => {
+            this.trigger('_registration', {
+              network: 'apns',
+              token: token
+            });
+          };
+          pushNotification.register(success, reject, {
+            badge: true,
+            sound: true,
+            alert: true,
+            ecb: "onNotificationAPNS"
+          });
+          break;
+        default:
+          reject(new Error('Invalid platform'));
+      }
+    });
+  },
+
+  /**
+    Unregisters this specific device for push notifications.
+
+    Example:
+
+    ```javascript
+    // app/routes/application.js
+    import Em from 'ember';
+
+    export default Em.Route.extend({
+      actions: {
+        unsubscribeNotifications: function(){
+          this.notifications.unregister().then(function(){
+            Em.Logger.info('Successfully unregistered the device');
+          }).catch(function(error){
+            Em.Logger.error('Something went wrong while unregistering', error);
+          });
+        }
+      }
+    });
+    ```
+
+    @method unregister
+    @return {RSVP.Promise} A promise that will resolve when registration is successful.
+  */
+  unregister: function(){
+    return new Em.RSVP.Promise((resolve, reject) => {
+      const pushNotification = window.plugins.pushNotification;
+      pushNotification.unregister(resolve, reject, {});
+    });
+  },
+
+  /**
+    Sets up callbacks expected by PushPlugin
+    @method _subscribeForEcb
+    @private
+  */
   _subscribeForEcb: function(){
     window.onNotificationGCM = (e) => {
       switch (e.event) {
@@ -70,6 +263,12 @@ export default Em.Service.extend(Em.Evented, {
     };
   },
 
+  /**
+    Sets the badge count on the app icon if possible. Fails silently.
+    @method _setBadgeCount
+    @param {Number} badgeCount The current badge count.
+    @private
+  */
   _setBadgeCount: function(badgeCount){
     new Em.RSVP.Promise(function(resolve, reject){
       const pushNotification = window.plugins.pushNotification;
@@ -79,6 +278,12 @@ export default Em.Service.extend(Em.Evented, {
     });
   },
 
+  /**
+    Plays a sound on the device. Fails silently.
+    @method _playSound
+    @param {String} filename Filename for the sound to play.
+    @private
+  */
   _playSound: function(filename){
     if (!window.Media) {
       Em.Logger.warn("Unable to play sound. Media object not available.");
@@ -86,60 +291,5 @@ export default Em.Service.extend(Em.Evented, {
     }
     let sound = new window.Media(filename);
     sound.play();
-  },
-
-  register: function(){
-    return new Em.RSVP.Promise((resolve, reject) => {
-      const pushNotification = window.plugins.pushNotification;
-      let success = resolve;
-
-      this.one('_registration', resolve);
-      switch (window.device.platform.toLowerCase()) {
-        case 'android':
-        case 'amazon-fireos':
-          let gcmSenderId = this.get('gcmSenderId'),
-              gcmTimeout  = this.get('gcmTimeout');
-
-          Em.assert('Attempted to register device for notifications with GCM Sender ID', gcmSenderId);
-
-          Em.Logger.info('Attempting registration with GCM');
-          success = function(){
-            // Wait for registration event for up to 15 seconds
-            setTimeout(function(){
-              reject(new Error('Timed out while registering for GCM'));
-            }, gcmTimeout);
-          };
-          pushNotification.register(success, reject, {
-            senderId: gcmSenderId,
-            ecb: "onNotificationGCM"
-          });
-          break;
-        case 'ios':
-          Em.Logger.info('Attempting registration with APNS');
-          success = (token) => {
-            this.trigger('_registration', {
-              network: 'apns',
-              token: token
-            });
-          };
-          pushNotification.register(success, reject, {
-            badge: true,
-            sound: true,
-            alert: true,
-            ecb: "onNotificationAPNS"
-          });
-          break;
-        default:
-          reject(new Error('Invalid platform'));
-      }
-    });
-  },
-
-  unregister: function(){
-    return new Em.RSVP.Promise((resolve, reject) => {
-      const pushNotification = window.plugins.pushNotification;
-      pushNotification.unregister(resolve, reject, {});
-    });
   }
-
 });

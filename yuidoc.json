@@ -1,0 +1,11 @@
+{
+  "name": "Ember CLI Cordova Shims",
+  "description": "Makes it simple to use a range of different Cordova plugins.",
+  "url": "http://github.com/Skalar/ember-cli-cordova-shims",
+  "options": {
+    "paths": [
+      "addon"
+    ],
+    "outdir":   "docs"
+  }
+}

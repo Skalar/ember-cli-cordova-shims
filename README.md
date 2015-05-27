@@ -31,7 +31,7 @@ Usage:
 
 ```javascript
 // app/initializers/pushplugin.js
-import NotificationsService from 'ember-cli-cordova-shims/services/notifications';
+import NotificationsService from 'cordova-shims/services/notifications';
 
 export function initialize(container, application) {
   let service = NotificationsService.create({
@@ -69,7 +69,16 @@ export default Em.Route.extend({
 
   actions: {
     subscribeForNotifications: function(){
-      this.notifications.register().then(function(){
+      let store = this.store;
+
+      this.notifications.register().then(function(data){
+        let network = data.network,
+              token = data.token;
+        return store.createRecord('device', {
+          network: network,
+          token: token
+        }).save();
+      }).then(function(deviceModelFromStore){
         Em.Logger.info('Successfully registered for notifications');
       }).catch(function(error){
         Em.Logger.error('Something went wrong registering for notifications', error);
@@ -89,6 +98,7 @@ export default Em.Route.extend({
 
 Caveats:
 
+* It's not possible to know what device what unregistered when calling `unregister`
 * PushPlugin has a weird setup for registering devices with GCM. There is a timeout
 of 15 seconds when doing a registration with GCM. If GCM does not send a `registered`
 event within this timeframe, the device is not registered. The timeout value may be
@@ -109,6 +119,13 @@ overridden by passing `gcmTimeout` when instantiating the service.
 
 * `ember test`
 * `ember test --server`
+
+## Documentation
+
+The modules are documented with yuidoc.
+
+* `npm install yuidocjs -g`
+* `yuidoc -c yuidoc.js`
 
 ## Building
 
