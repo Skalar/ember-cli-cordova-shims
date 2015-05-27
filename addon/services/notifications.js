@@ -1,5 +1,10 @@
 import Em from 'ember';
 
+const missingPlugin = function(name, src){
+  Em.Logger.warn("Missing Cordova Plugin: "+name+"\n"+
+                 "Install with: cordova plugin add "+src);
+};
+
 /**
   Service that allows for registration/unregistration and handling of push
   notifications received from GCM or APNs.
@@ -80,7 +85,10 @@ export default Em.Service.extend(Em.Evented, {
     this.on('badge', this, this._setBadgeCount);
     this.on('sound', this, this._playSound);
     if (!window.device) {
-      Ember.Logger.warn("Missing Cordova Device plugin");
+      missingPlugin('Device', 'org.apache.cordova.device');
+    }
+    if (!window.plugins || !window.plugins.pushNotification) {
+      missingPlugin('PushPlugin', 'https://github.com/phonegap-build/PushPlugin.git');
     }
   },
 
