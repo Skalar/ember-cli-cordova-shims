@@ -5,6 +5,6 @@ module('Unit | Utility | missing plugin');
 
 // Replace this with your real tests.
 test('it works', function(assert) {
-  var result = missingPlugin();
-  assert.ok(result);
+  var result = missingPlugin;
+  assert.equal(typeof(result), 'function');
 });
