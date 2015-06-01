@@ -1,9 +1,5 @@
 import Em from 'ember';
-
-const missingPlugin = function(name, src){
-  Em.Logger.warn("Missing Cordova Plugin: "+name+"\n"+
-                 "Install with: cordova plugin add "+src);
-};
+import missingPlugin from '../utils/missing-plugin';
 
 /**
   Service that allows for registration/unregistration and handling of push
