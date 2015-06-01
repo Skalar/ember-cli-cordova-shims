@@ -1,9 +1,5 @@
 import Em from 'ember';
-
-const missingPlugin = function(name, src){
-  Em.Logger.warn("Missing Cordova Plugin: "+name+"\n"+
-                 "Install with: cordova plugin add "+src);
-};
+import missingPlugin from '../utils/missing-plugin';
 
 /**
   Service that allows for registration/unregistration and handling of push
@@ -35,6 +31,7 @@ const missingPlugin = function(name, src){
   @namespace CordovaShims.Services
   @module cordova-shims/services/notifications
   @extends Ember.Service
+  @since 0.1.0
  */
 export default Em.Service.extend(Em.Evented, {
   /**

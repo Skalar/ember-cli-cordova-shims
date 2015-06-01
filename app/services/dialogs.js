@@ -1,0 +1,1 @@
+export { default } from 'ember-cli-cordova-shims/services/dialogs';
