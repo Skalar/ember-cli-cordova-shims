@@ -104,6 +104,55 @@ of 15 seconds when doing a registration with GCM. If GCM does not send a `regist
 event within this timeframe, the device is not registered. The timeout value may be
 overridden by passing `gcmTimeout` when instantiating the service.
 
+### Dialogs
+
+Dependencies:
+
+* `cordova plugin add https://github.com/apache/cordova-plugin-dialogs.git`
+
+Public Methods:
+
+* `alert` - Show a message to the user
+* `confirm` - Ask for some confirmation from the user
+* `prompt` - Ask for some information from the user
+
+Usage:
+
+```javascript
+// app/initializers/dialogs-service.js
+import DialogsService from 'cordova-shims/services/dialogs';
+
+export function initialize(container, application) {
+  application.register('service:dialogs', DialogsService);
+  application.inject('route', 'dialogs', 'service:dialogs');
+}
+
+export default {
+  name: 'dialogs-service',
+  initialize: initialize
+};
+```
+
+```javascript
+// app/routes/application.js
+import Em from 'ember';
+
+export default Em.Route.extend({
+
+  actions: {
+    something: function(){
+      this.dialogs.alert({
+        title: 'Hey',
+        message: 'This just happened',
+        button: 'OK'
+      }).then(function(){
+        // Do something
+      });
+    }
+  }
+});
+```
+
 ## Installation
 
 * `git clone` this repository
@@ -125,7 +174,7 @@ overridden by passing `gcmTimeout` when instantiating the service.
 The modules are documented with yuidoc.
 
 * `npm install yuidocjs -g`
-* `yuidoc -c yuidoc.js`
+* `yuidoc -c yuidoc.json`
 
 ## Building
 
