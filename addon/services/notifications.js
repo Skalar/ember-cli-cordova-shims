@@ -35,6 +35,7 @@ const missingPlugin = function(name, src){
   @namespace CordovaShims.Services
   @module cordova-shims/services/notifications
   @extends Ember.Service
+  @since 0.1.0
  */
 export default Em.Service.extend(Em.Evented, {
   /**
