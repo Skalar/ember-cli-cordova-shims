@@ -31,7 +31,7 @@ Usage:
 
 ```javascript
 // app/initializers/pushplugin.js
-import NotificationsService from 'cordova-shims/services/notifications';
+import NotificationsService from 'ember-cli-cordova-shims/services/notifications';
 
 export function initialize(container, application) {
   let service = NotificationsService.create({
@@ -120,7 +120,7 @@ Usage:
 
 ```javascript
 // app/initializers/dialogs-service.js
-import DialogsService from 'cordova-shims/services/dialogs';
+import DialogsService from 'ember-cli-cordova-shims/services/dialogs';
 
 export function initialize(container, application) {
   application.register('service:dialogs', DialogsService);
@@ -150,6 +150,23 @@ export default Em.Route.extend({
       });
     }
   }
+});
+```
+
+### Network Activity Indicator
+
+Dependencies:
+
+* `cordova plugin add com.wearecocoon.cordova.plugin.networkactivity`
+
+Usage:
+
+```javascript
+// app/adaptesr/application.js
+import NetworkActivityAdapterMixin from 'ember-cli-cordova-shims/mixins/network-activity-adapter';
+
+export default DS.RESTAdapter.extend(NetworkActivityAdapterMixin, {
+  // Your implementation goes here
 });
 ```
 
