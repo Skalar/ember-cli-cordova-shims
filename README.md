@@ -1,3 +1,8 @@
+[![Codeship](https://img.shields.io/codeship/3b024750-eb65-0132-bd94-5ecc4fff82a0.svg)](https://codeship.com/projects/83402)
+[![npm](https://img.shields.io/npm/v/ember-cli-cordova-shims.svg)](https://www.npmjs.com/package/ember-cli-cordova-shims)
+[![npm](https://img.shields.io/npm/dm/ember-cli-cordova-shims.svg)](https://www.npmjs.com/package/ember-cli-cordova-shims)
+[![npm](https://img.shields.io/npm/l/ember-cli-cordova-shims.svg)](https://www.npmjs.com/package/ember-cli-cordova-shims)
+
 # Ember CLI Cordova Shims
 
 This Ember addon makes it simple to use a range of different Cordova plugins.
