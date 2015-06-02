@@ -21,7 +21,7 @@ import missingPlugin from '../utils/missing-plugin';
   @namespace CordovaShims.Mixins
   @module ember-cli-cordova-shims/mixins/network-activity-adapter
   @extends Ember.Mixin
-  @since {wip}
+  @since 0.3.0
  */
 export default Em.Mixin.create({
   _pendingAjaxCalls: 0,
