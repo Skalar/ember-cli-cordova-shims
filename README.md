@@ -153,6 +153,23 @@ export default Em.Route.extend({
 });
 ```
 
+### Network Activity Indicator
+
+Dependencies:
+
+* `cordova plugin add com.wearecocoon.cordova.plugin.networkactivity`
+
+Usage:
+
+```javascript
+// app/adaptesr/application.js
+import NetworkActivityAdapterMixin from 'cordova-shims/mixins/network-activity-adapter';
+
+export default DS.RESTAdapter.extend(NetworkActivityAdapterMixin, {
+  // Your implementation goes here
+});
+```
+
 ## Installation
 
 * `git clone` this repository
