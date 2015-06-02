@@ -4,6 +4,10 @@ This Ember addon makes it simple to use a range of different Cordova plugins.
 
 ## Supported features
 
+* [Push Notifications](#push-notifications)
+* [Dialogs](#dialogs)
+* [Network Activity Indicator](#network-activity-indicator)
+
 ### Push Notifications
 
 Dependencies:
