@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-cordova-shims",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Makes it simple to use a range of different Cordova plugins.",
   "directories": {
     "doc": "doc",
