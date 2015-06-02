@@ -8,7 +8,7 @@ import missingPlugin from '../utils/missing-plugin';
   Configuration and setup of the service is done in an initializer:
 
   ```javascript
-  import NotificationsService from 'cordova-shims/services/notifications';
+  import NotificationsService from 'ember-cli-cordova-shims/services/notifications';
 
   export function initialize(container, application) {
     let service = NotificationsService.create({
@@ -29,7 +29,7 @@ import missingPlugin from '../utils/missing-plugin';
 
   @class Notifications
   @namespace CordovaShims.Services
-  @module cordova-shims/services/notifications
+  @module ember-cli-cordova-shims/services/notifications
   @extends Ember.Service
   @since 0.1.0
  */

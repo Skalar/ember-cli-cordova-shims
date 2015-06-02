@@ -7,7 +7,7 @@ import missingPlugin from '../utils/missing-plugin';
   Configuration and setup of the service is done in an initializer:
 
   ```javascript
-  import DialogsService from 'cordova-shims/services/dialogs';
+  import DialogsService from 'ember-cli-cordova-shims/services/dialogs';
 
   export function initialize(container, application) {
     application.register('service:dialogs', DialogsService);
@@ -33,7 +33,7 @@ import missingPlugin from '../utils/missing-plugin';
 
   @class Dialogs
   @namespace CordovaShims.Services
-  @module cordova-shims/services/dialogs
+  @module ember-cli-cordova-shims/services/dialogs
   @extends Ember.Service
   @since 0.2.0
  */

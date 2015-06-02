@@ -10,7 +10,7 @@ import missingPlugin from '../utils/missing-plugin';
   ```javascript
   // app/adapters/application.js
   import DS from 'ember-data';
-  import NetworkActivityAdapterMixin from 'cordova-shims/mixins/network-activity-adapter';
+  import NetworkActivityAdapterMixin from 'ember-cli-cordova-shims/mixins/network-activity-adapter';
 
   export default DS.RESTAdapter.extend(NetworkActivityAdapterMixin, {
     ...
@@ -19,7 +19,7 @@ import missingPlugin from '../utils/missing-plugin';
 
   @class NetworkActivityAdapterMixin
   @namespace CordovaShims.Mixins
-  @module cordova-shims/mixins/network-activity-adapter
+  @module ember-cli-cordova-shims/mixins/network-activity-adapter
   @extends Ember.Mixin
   @since {wip}
  */
